@@ -228,10 +228,13 @@ class MainView(QMainWindow):
                 )
 
     def open_page(self, name):
-        page = self.pages.get(name)
+        page_data = self.pages.get(name)
 
-        if page:
+        if page_data:
+            page, _layout = page_data
             self.stack.setCurrentWidget(page)
 
             if name == "Моя библиотека":
                 self.refresh_library()
+
+
