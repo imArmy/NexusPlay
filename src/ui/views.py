@@ -13,32 +13,51 @@ from data.library import (
 )
 from data.ps5_store import FREE_GAMES, STORE_URL
 from data.pc_stores import PC_STORES
+from mini_games.arcade import ArcadeGame
 
 
 class MainView(QMainWindow):
     def __init__(self):
         super().__init__()
+
         self.setWindowTitle("NexusPlay 2.0")
         self.resize(1250, 800)
         self.setMinimumSize(950, 650)
 
         self.stack = QStackedWidget()
+
         self.pages = {
-            "Главная": self.create_page("NEXUSPLAY", "Твоя игровая платформа"),
-            "PlayStation Store": self.create_page("PlayStation Store", "Игры PlayStation"),
-            "PC Store": self.create_page("PC Store", "Магазины компьютерных игр"),
-            "Моя библиотека": self.create_page("Моя библиотека", "Твои установленные игры"),
-            "Мини-игры": self.create_page("Nexus Arcade", "Мини-игры"),
-            "Настройки": self.create_page("Настройки", "Настройки приложения")
+            "Главная": self.create_page(
+                "NEXUSPLAY", "Твоя игровая платформа"
+            ),
+            "PlayStation Store": self.create_page(
+                "PlayStation Store", "Игры PlayStation"
+            ),
+            "PC Store": self.create_page(
+                "PC Store", "Магазины компьютерных игр"
+            ),
+            "Моя библиотека": self.create_page(
+                "Моя библиотека", "Твои установленные игры"
+            ),
+            "Мини-игры": self.create_page(
+                "Nexus Arcade", "Играй прямо в лаунчере"
+            ),
+            "Настройки": self.create_page(
+                "Настройки", "Настройки приложения"
+            )
         }
 
         for page, layout in self.pages.values():
             self.stack.addWidget(page)
 
+        self.arcade_window = None
+
         self.build_interface()
         self.build_library()
         self.build_ps_store()
         self.build_pc_store()
+        self.build_arcade()
+
         self.open_page("Главная")
 
     def create_page(self, title, subtitle):
@@ -49,12 +68,14 @@ class MainView(QMainWindow):
 
         heading = QLabel(title)
         heading.setObjectName("PageTitle")
+
         description = QLabel(subtitle)
         description.setObjectName("Subtitle")
 
         layout.addWidget(heading)
         layout.addWidget(description)
         layout.addSpacing(15)
+
         return page, layout
 
     def build_interface(self):
@@ -66,6 +87,7 @@ class MainView(QMainWindow):
         sidebar = QFrame()
         sidebar.setObjectName("Sidebar")
         sidebar.setFixedWidth(220)
+
         side_layout = QVBoxLayout(sidebar)
 
         logo = QLabel("NEXUSPLAY")
@@ -81,18 +103,22 @@ class MainView(QMainWindow):
             side_layout.addWidget(button)
 
         side_layout.addStretch()
+
         version = QLabel("NEXUSPLAY 2.0")
         version.setObjectName("Version")
         side_layout.addWidget(version)
 
         main_layout.addWidget(sidebar)
         main_layout.addWidget(self.stack, 1)
+
         self.setCentralWidget(central)
 
     def open_page(self, name):
         page_data = self.pages.get(name)
+
         if page_data:
             self.stack.setCurrentWidget(page_data[0])
+
             if name == "Моя библиотека":
                 self.refresh_library()
 
@@ -102,7 +128,9 @@ class MainView(QMainWindow):
         page, layout = self.pages["PlayStation Store"]
 
         self.ps_search = QLineEdit()
-        self.ps_search.setPlaceholderText("Поиск игр PlayStation...")
+        self.ps_search.setPlaceholderText(
+            "Поиск игр PlayStation..."
+        )
         layout.addWidget(self.ps_search)
 
         self.ps_game_list = QListWidget()
@@ -112,27 +140,43 @@ class MainView(QMainWindow):
         button.clicked.connect(self.open_ps_game)
         layout.addWidget(button)
 
-        self.ps_search.textChanged.connect(self.filter_ps_games)
+        self.ps_search.textChanged.connect(
+            self.filter_ps_games
+        )
+
         self.filter_ps_games("")
 
     def filter_ps_games(self, text):
         self.ps_game_list.clear()
+
         for game in FREE_GAMES:
             if text.lower() in game["name"].lower():
                 item = QListWidgetItem(
-                    f'{game["name"]} • {game["platform"]} • {game["price"]}'
+                    f'{game["name"]} • '
+                    f'{game["platform"]} • '
+                    f'{game["price"]}'
                 )
-                item.setData(Qt.ItemDataRole.UserRole, game["name"])
+
+                item.setData(
+                    Qt.ItemDataRole.UserRole,
+                    game["name"]
+                )
+
                 self.ps_game_list.addItem(item)
 
     def open_ps_game(self):
         item = self.ps_game_list.currentItem()
+
         if not item:
-            QMessageBox.information(self, "PlayStation Store", "Выбери игру.")
+            QMessageBox.information(
+                self, "PlayStation Store",
+                "Сначала выбери игру."
+            )
             return
 
         name = item.data(Qt.ItemDataRole.UserRole)
         encoded = QUrl.toPercentEncoding(name).data().decode()
+
         QDesktopServices.openUrl(
             QUrl(STORE_URL + "en-us/search/" + encoded)
         )
@@ -145,22 +189,28 @@ class MainView(QMainWindow):
         for store in PC_STORES:
             card = QFrame()
             card.setObjectName("Sidebar")
+
             card_layout = QVBoxLayout(card)
 
             title = QLabel(store["name"])
-            title.setStyleSheet("font-size: 22px; font-weight: bold;")
+            title.setStyleSheet(
+                "font-size: 22px; font-weight: bold;"
+            )
+
             description = QLabel(store["description"])
 
             buttons = QHBoxLayout()
 
             main_button = QPushButton("Открыть магазин")
             main_button.clicked.connect(
-                lambda checked=False, url=store["url"]: self.open_url(url)
+                lambda checked=False, url=store["url"]:
+                self.open_url(url)
             )
 
             free_button = QPushButton("Бесплатные игры")
             free_button.clicked.connect(
-                lambda checked=False, url=store["free_url"]: self.open_url(url)
+                lambda checked=False, url=store["free_url"]:
+                self.open_url(url)
             )
 
             buttons.addWidget(main_button)
@@ -169,6 +219,7 @@ class MainView(QMainWindow):
             card_layout.addWidget(title)
             card_layout.addWidget(description)
             card_layout.addLayout(buttons)
+
             layout.addWidget(card)
 
         layout.addStretch()
@@ -187,78 +238,161 @@ class MainView(QMainWindow):
         add_button.clicked.connect(self.add_library_game)
 
         launch_button = QPushButton("Запустить")
-        launch_button.clicked.connect(self.launch_library_game)
+        launch_button.clicked.connect(
+            self.launch_library_game
+        )
 
         rename_button = QPushButton("Переименовать")
-        rename_button.clicked.connect(self.rename_library_game)
+        rename_button.clicked.connect(
+            self.rename_library_game
+        )
 
         remove_button = QPushButton("Удалить из списка")
-        remove_button.clicked.connect(self.remove_library_game)
+        remove_button.clicked.connect(
+            self.remove_library_game
+        )
 
-        for button in (add_button, launch_button, rename_button, remove_button):
+        for button in (
+            add_button, launch_button,
+            rename_button, remove_button
+        ):
             buttons.addWidget(button)
 
         layout.addLayout(buttons)
+
         self.game_list = QListWidget()
         layout.addWidget(self.game_list)
 
     def refresh_library(self):
         self.game_list.clear()
+
         for game in load_games():
             item = QListWidgetItem(game["name"])
-            item.setData(Qt.ItemDataRole.UserRole, game["path"])
+            item.setData(
+                Qt.ItemDataRole.UserRole,
+                game["path"]
+            )
             self.game_list.addItem(item)
 
     def selected_game_path(self):
         item = self.game_list.currentItem()
+
         if not item:
-            QMessageBox.information(self, "Библиотека", "Сначала выбери игру.")
+            QMessageBox.information(
+                self, "Библиотека",
+                "Сначала выбери игру."
+            )
             return None
+
         return item.data(Qt.ItemDataRole.UserRole)
 
     def add_library_game(self):
         path, _ = QFileDialog.getOpenFileName(
-            self, "Выбери EXE-файл игры", "", "Программы (*.exe)"
+            self, "Выбери EXE-файл игры",
+            "", "Программы (*.exe)"
         )
+
         if not path:
             return
+
         try:
             add_game(path)
             self.refresh_library()
         except Exception as error:
-            QMessageBox.warning(self, "Ошибка", str(error))
+            QMessageBox.warning(
+                self, "Ошибка", str(error)
+            )
 
     def launch_library_game(self):
         path = self.selected_game_path()
+
         if not path:
             return
+
         try:
             launch_game(path)
         except Exception as error:
-            QMessageBox.warning(self, "Ошибка", str(error))
+            QMessageBox.warning(
+                self, "Ошибка", str(error)
+            )
 
     def rename_library_game(self):
         path = self.selected_game_path()
+
         if not path:
             return
+
         name, ok = QInputDialog.getText(
-            self, "Переименование", "Новое название:"
+            self, "Переименование",
+            "Новое название:"
         )
+
         if ok:
             try:
                 rename_game(path, name)
                 self.refresh_library()
             except Exception as error:
-                QMessageBox.warning(self, "Ошибка", str(error))
+                QMessageBox.warning(
+                    self, "Ошибка", str(error)
+                )
 
     def remove_library_game(self):
         path = self.selected_game_path()
+
         if not path:
             return
+
         answer = QMessageBox.question(
             self, "Удаление",
-            "Убрать игру из библиотеки? Сам файл игры останется."
+            "Убрать игру из библиотеки? "
+            "Сам файл игры останется."
         )
+
         if answer == QMessageBox.StandardButton.Yes:
             remove_game(path)
             self.refresh_library()
+
+    # NEXUS ARCADE
+
+    def build_arcade(self):
+        page, layout = self.pages["Мини-игры"]
+
+        games = [
+            ("2048", "Числовая головоломка"),
+            ("Snake", "Классическая змейка"),
+            ("Tetris", "Собирай линии"),
+            ("Сапёр", "Найди безопасные клетки")
+        ]
+
+        for name, description in games:
+            card = QFrame()
+            card.setObjectName("Sidebar")
+
+            card_layout = QVBoxLayout(card)
+
+            title = QLabel(name)
+            title.setStyleSheet(
+                "font-size: 22px; font-weight: bold;"
+            )
+
+            subtitle = QLabel(description)
+
+            button = QPushButton("ИГРАТЬ")
+            button.clicked.connect(
+                lambda checked=False, game=name:
+                self.launch_arcade(game)
+            )
+
+            card_layout.addWidget(title)
+            card_layout.addWidget(subtitle)
+            card_layout.addWidget(button)
+
+            layout.addWidget(card)
+
+        layout.addStretch()
+
+    def launch_arcade(self, name):
+        self.arcade_window = ArcadeGame(name)
+        self.arcade_window.show()
+        self.arcade_window.activateWindow()
+        self.arcade_window.setFocus()
