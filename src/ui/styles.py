@@ -1,36 +1,36 @@
 APP_STYLE = """
 QMainWindow {
-    background-color: #080d1b;
+    background-color: #070b16;
 }
 
 QWidget {
-    background-color: #080d1b;
+    background-color: #070b16;
     color: #f4f7ff;
     font-family: "Segoe UI";
-    font-size: 13px;
+    font-size: 14px;
 }
 
 #Sidebar {
     background-color: #101a30;
-    border: 1px solid #1b2b49;
+    border: 1px solid #203354;
     border-radius: 18px;
 }
 
 #Logo {
     color: #168cff;
-    font-size: 25px;
+    font-size: 27px;
     font-weight: 900;
-    padding: 12px;
+    padding: 15px;
 }
 
 #PageTitle {
     color: #ffffff;
-    font-size: 32px;
+    font-size: 34px;
     font-weight: 800;
 }
 
 #Subtitle {
-    color: #9eacc7;
+    color: #94a8c9;
     font-size: 14px;
 }
 
@@ -41,13 +41,13 @@ QWidget {
     border-radius: 10px;
     padding: 14px;
     text-align: left;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 600;
 }
 
 #NavButton:hover {
     background-color: #1b3154;
-    color: #ffffff;
+    color: white;
 }
 
 #NavButton:pressed {
@@ -62,22 +62,64 @@ QWidget {
 }
 
 QPushButton {
-    background-color: #168cff;
+    background-color: #167bea;
     color: white;
     border: none;
-    border-radius: 9px;
-    padding: 10px 16px;
+    border-radius: 10px;
+    padding: 12px 18px;
+    font-weight: bold;
 }
 
 QPushButton:hover {
     background-color: #369dff;
 }
 
+QPushButton:pressed {
+    background-color: #0756ad;
+}
+
 QLineEdit {
     background-color: #14223b;
     border: 1px solid #263d62;
-    border-radius: 8px;
-    padding: 10px;
+    border-radius: 10px;
+    padding: 12px;
     color: white;
+    selection-background-color: #168cff;
+}
+
+QListWidget {
+    background-color: #101a30;
+    border: 1px solid #203354;
+    border-radius: 12px;
+    padding: 8px;
+    outline: none;
+}
+
+QListWidget::item {
+    background-color: #172642;
+    border-radius: 8px;
+    padding: 14px;
+    margin: 4px;
+}
+
+QListWidget::item:hover {
+    background-color: #213c64;
+}
+
+QListWidget::item:selected {
+    background-color: #167bea;
+    color: white;
+}
+
+QLabel {
+    background-color: transparent;
+}
+
+QMessageBox {
+    background-color: #101a30;
+}
+
+QInputDialog {
+    background-color: #101a30;
 }
 """
