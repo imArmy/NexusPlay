@@ -2,9 +2,13 @@ from PySide6.QtWidgets import (
     QMainWindow, QWidget, QLabel, QPushButton,
     QVBoxLayout, QHBoxLayout, QStackedWidget,
     QFrame, QFileDialog, QMessageBox, QListWidget,
-    QListWidgetItem, QInputDialog
+    QListWidgetItem, QInputDialog, QLineEdit
 )
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QUrl
+from PySide6.QtGui import QDesktopServices
+
+from data.ps5_store import FREE_GAMES, STORE_URL
+
 
 from data.library import (
     load_games, add_game, remove_game,
